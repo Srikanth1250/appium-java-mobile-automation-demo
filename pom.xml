@@ -27,7 +27,6 @@
     </properties>
 
     <profiles>
-        <!-- Platform profiles -->
         <profile>
             <id>android</id>
             <activation>
@@ -43,8 +42,6 @@
                 <platform>ios</platform>
             </properties>
         </profile>
-
-        <!-- Environment profiles -->
         <profile>
             <id>dev</id>
             <activation>
@@ -79,7 +76,6 @@
             </properties>
         </profile>
 
-        <!-- Test suite profiles -->
         <profile>
             <id>smoke-test</id>
             <build>
@@ -200,7 +196,8 @@
             <artifactId>log4j-core</artifactId>
             <version>${log4j.core.version}</version>
         </dependency>
-             <dependency>
+        <!-- ✅ Added Lombok -->
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
