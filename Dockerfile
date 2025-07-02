@@ -1,26 +1,14 @@
-# === Stage 1: Build with Maven ===
-FROM maven:3.9.6-eclipse-temurin-17 AS build
+# Use a Maven base image with JDK 11 (or adjust to your project's needs)
+FROM maven:3.9.6-eclipse-temurin-11
 
-# Set working directory
-WORKDIR /app
+# Set the working directory inside the container
+WORKDIR /usr/src/app
 
-# Copy pom.xml and download dependencies
-COPY pom.xml .
-RUN mvn dependency:go-offline
+# Copy the project files into the container
+COPY . .
 
-# Copy the rest of the source code
-COPY src ./src
+# Build the project (skip tests if needed)
+RUN mvn clean compile -DskipTests
 
-# Build the application, skip tests
-RUN mvn clean install -DskipTests
-
-# === Stage 2: Runtime ===
-FROM eclipse-temurin:17-jdk
-
-WORKDIR /app
-
-# Copy built jar from the previous stage
-COPY --from=build /app/target/sonarqube-maven-example-1.0.0.jar app.jar
-
-# Command to run the jar
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Set default command (optional)
+CMD ["mvn", "clean", "compile", "-DskipTests"]
