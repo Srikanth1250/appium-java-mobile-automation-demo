@@ -1,13 +1,14 @@
-# Stage 1: Build
+# Use Maven with JDK 11
 FROM maven:3.9.6-eclipse-temurin-11 AS builder
 
+# Set work directory
 WORKDIR /app
 
-# Copy all project files
+# Copy everything
 COPY . .
 
-# Build the project
+# Optional: clean install without running tests
 RUN mvn clean install -DskipTests
 
-# Stage 2: Run tests if needed (or skip if only building)
-CMD ["mvn", "test"]
+# Default command: run tests (you can override this with docker run)
+CMD ["mvn", "test", "-Dplatform=android", "-Denv=dev"]
