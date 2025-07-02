@@ -14,6 +14,7 @@
         <maven.surefire.plugin.version>3.0.0-M5</maven.surefire.plugin.version>
         <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
         <appium.java.client.version>9.2.3</appium.java.client.version>
+        <selenium.version>4.20.0</selenium.version>
         <testng.version>7.10.2</testng.version>
         <mockneat.version>0.4.8</mockneat.version>
         <commons.io.version>2.16.1</commons.io.version>
@@ -27,55 +28,27 @@
     </properties>
 
     <profiles>
+        <!-- platform/env profiles -->
         <profile>
             <id>android</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <platform>android</platform>
-            </properties>
+            <activation><activeByDefault>true</activeByDefault></activation>
+            <properties><platform>android</platform></properties>
         </profile>
         <profile>
             <id>ios</id>
-            <properties>
-                <platform>ios</platform>
-            </properties>
+            <properties><platform>ios</platform></properties>
         </profile>
         <profile>
             <id>dev</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <env>dev</env>
-            </properties>
+            <activation><activeByDefault>true</activeByDefault></activation>
+            <properties><env>dev</env></properties>
         </profile>
-        <profile>
-            <id>qa</id>
-            <properties>
-                <env>qa</env>
-            </properties>
-        </profile>
-        <profile>
-            <id>uat</id>
-            <properties>
-                <env>uat</env>
-            </properties>
-        </profile>
-        <profile>
-            <id>pre-prod</id>
-            <properties>
-                <env>pre-prod</env>
-            </properties>
-        </profile>
-        <profile>
-            <id>prod</id>
-            <properties>
-                <env>prod</env>
-            </properties>
-        </profile>
+        <profile><id>qa</id><properties><env>qa</env></properties></profile>
+        <profile><id>uat</id><properties><env>uat</env></properties></profile>
+        <profile><id>pre-prod</id><properties><env>pre-prod</env></properties></profile>
+        <profile><id>prod</id><properties><env>prod</env></properties></profile>
 
+        <!-- test suite profiles -->
         <profile>
             <id>smoke-test</id>
             <build>
@@ -92,7 +65,6 @@
                 </plugins>
             </build>
         </profile>
-
         <profile>
             <id>regression-test</id>
             <build>
@@ -161,31 +133,49 @@
     </build>
 
     <dependencies>
+        <!-- Appium client -->
         <dependency>
             <groupId>io.appium</groupId>
             <artifactId>java-client</artifactId>
             <version>${appium.java.client.version}</version>
         </dependency>
+
+        <!-- Selenium Java client -->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>${selenium.version}</version>
+        </dependency>
+
+        <!-- TestNG -->
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>${testng.version}</version>
         </dependency>
+
+        <!-- Mock Data Generator -->
         <dependency>
             <groupId>net.andreinc</groupId>
             <artifactId>mockneat</artifactId>
             <version>${mockneat.version}</version>
         </dependency>
+
+        <!-- Commons IO -->
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>${commons.io.version}</version>
         </dependency>
+
+        <!-- Extent Reports -->
         <dependency>
             <groupId>com.aventstack</groupId>
             <artifactId>extentreports</artifactId>
             <version>${extent.report.version}</version>
         </dependency>
+
+        <!-- Logging -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
@@ -196,7 +186,8 @@
             <artifactId>log4j-core</artifactId>
             <version>${log4j.core.version}</version>
         </dependency>
-        <!-- ✅ Added Lombok -->
+
+        <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
