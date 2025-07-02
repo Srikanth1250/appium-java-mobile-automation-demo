@@ -1,14 +1,23 @@
-# Use Maven with JDK 11
-FROM maven:3.9.6-eclipse-temurin-11 AS builder
+# Use an official Maven base image with Java 11
+FROM maven:3.9.6-eclipse-temurin-11 as build
 
-# Set work directory
+# Set working directory inside container
 WORKDIR /app
 
-# Copy everything
+# Copy all files into the container
 COPY . .
 
-# Optional: clean install without running tests
+# Build the project without running tests
 RUN mvn clean install -DskipTests
 
-# Default command: run tests (you can override this with docker run)
-CMD ["mvn", "test", "-Dplatform=android", "-Denv=dev"]
+# ---- Final Stage ----
+FROM eclipse-temurin:11-jre
+
+# Set working directory in final image
+WORKDIR /app
+
+# Copy the built project from the build stage
+COPY --from=build /app .
+
+# Default command to run TestNG tests (you can change profile: smoke-test, regression-test, etc.)
+CMD ["mvn", "test", "-P", "smoke-test"]
