@@ -11,8 +11,11 @@
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
         <maven.surefire.plugin.version>3.0.0-M5</maven.surefire.plugin.version>
         <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
+
         <appium.java.client.version>9.2.3</appium.java.client.version>
         <selenium.version>4.20.0</selenium.version>
         <testng.version>7.10.2</testng.version>
@@ -22,10 +25,74 @@
         <lombok.version>1.18.18</lombok.version>
         <log4j.api.version>2.20.0</log4j.api.version>
         <log4j.core.version>2.20.0</log4j.core.version>
+
         <smoke.suite.testng.xml>src/test/resources/smoke-suite.xml</smoke.suite.testng.xml>
         <regression.suite.testng.xml>src/test/resources/regression-suite.xml</regression.suite.testng.xml>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <build>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+            </testResource>
+        </testResources>
+
+        <plugins>
+            <!-- Compiler Plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.plugin.version}</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+
+            <!-- Surefire Plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire.plugin.version}</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <environment>${env}</environment>
+                        <platform>${platform}</platform>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+
+            <!-- Enforcer Plugin (optional) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>enforce-java</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireJavaVersion>
+                                    <version>[11,)</version>
+                                </requireJavaVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
     <profiles>
         <profile>
@@ -33,20 +100,24 @@
             <activation><activeByDefault>true</activeByDefault></activation>
             <properties><platform>android</platform></properties>
         </profile>
+
         <profile>
             <id>ios</id>
             <properties><platform>ios</platform></properties>
         </profile>
+
         <profile>
             <id>dev</id>
             <activation><activeByDefault>true</activeByDefault></activation>
             <properties><env>dev</env></properties>
         </profile>
+
         <profile><id>qa</id><properties><env>qa</env></properties></profile>
         <profile><id>uat</id><properties><env>uat</env></properties></profile>
         <profile><id>pre-prod</id><properties><env>pre-prod</env></properties></profile>
         <profile><id>prod</id><properties><env>prod</env></properties></profile>
 
+        <!-- Smoke Test Profile -->
         <profile>
             <id>smoke-test</id>
             <build>
@@ -64,6 +135,7 @@
             </build>
         </profile>
 
+        <!-- Regression Test Profile -->
         <profile>
             <id>regression-test</id>
             <build>
@@ -82,55 +154,6 @@
         </profile>
     </profiles>
 
-    <build>
-        <testResources>
-            <testResource>
-                <directory>src/test/resources</directory>
-            </testResource>
-        </testResources>
-
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>${maven.surefire.plugin.version}</version>
-                    <configuration>
-                        <systemPropertyVariables>
-                            <environment>${env}</environment>
-                            <platform>${platform}</platform>
-                        </systemPropertyVariables>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven.compiler.plugin.version}</version>
-                <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                    <fork>true</fork>
-                    <compilerArgs>
-                        <arg>--add-exports</arg>
-                        <arg>jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</arg>
-                    </compilerArgs>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                            <version>${lombok.version}</version>
-                        </path>
-                    </annotationProcessorPaths>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
     <dependencies>
         <!-- Appium client -->
         <dependency>
@@ -146,7 +169,7 @@
             <version>${selenium.version}</version>
         </dependency>
 
-        <!-- ✅ Fix: Explicit selenium-api for ContextAware class -->
+        <!-- Selenium API -->
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-api</artifactId>
