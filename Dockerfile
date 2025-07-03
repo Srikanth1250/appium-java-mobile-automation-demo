@@ -1,21 +1,21 @@
-# ====== BUILD STAGE ======
-FROM eclipse-temurin:11-jdk as build
+# Use Maven + JDK17 image to build
+FROM maven:3.9.4-eclipse-temurin-17 AS build
 
 WORKDIR /app
 
-# Copy project files
-COPY . .
+# Copy POM and sources
+COPY pom.xml .
+COPY src ./src
 
-# Compile and skip tests
-RUN ./mvnw clean compile -DskipTests || mvn clean compile -DskipTests
+# Build jar
+RUN mvn clean package -DskipTests
 
-# ====== FINAL STAGE ======
-FROM eclipse-temurin:11-jdk  # <-- use JDK, not JRE to compile/run successfully
+# Run stage with JDK17 only
+FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
 
-# Copy everything from build stage
-COPY --from=build /app .
+COPY --from=build /app/target/appium-java-mobile-automation-demo-1.0.0.jar app.jar
 
-# Run TestNG suite by default (change profile as needed)
-CMD ["mvn", "test", "-P", "smoke-test"]
+# Run the jar file
+ENTRYPOINT ["java", "-jar", "app.jar"]
