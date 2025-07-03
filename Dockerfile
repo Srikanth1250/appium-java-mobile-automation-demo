@@ -1,33 +1,21 @@
-# ------------ Stage 1: Build the project with Maven ------------
-FROM maven:3.9.6-eclipse-temurin-11 AS build
+# ====== BUILD STAGE ======
+FROM eclipse-temurin:11-jdk as build
 
-# Set working directory
 WORKDIR /app
 
-# Copy everything to the container
+# Copy project files
 COPY . .
 
-# Build the Maven project (skip tests during build phase)
-RUN mvn clean package -DskipTests \
-    -Dmaven.compiler.showDeprecation=true \
-    -Dmaven.compiler.showWarnings=true \
-    -Dmaven.compiler.fork=true \
-    -Dmaven.compiler.compilerArgs="--add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED --add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED --add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED"
+# Compile and skip tests
+RUN ./mvnw clean compile -DskipTests || mvn clean compile -DskipTests
 
-# ------------ Stage 2: Runtime environment ------------
-FROM eclipse-temurin:11-jdk
+# ====== FINAL STAGE ======
+FROM eclipse-temurin:11-jdk  # <-- use JDK, not JRE to compile/run successfully
 
-# Set working directory
 WORKDIR /app
 
-# Copy built application from previous stage
+# Copy everything from build stage
 COPY --from=build /app .
 
-# Install Maven CLI (optional: if you want to run tests inside container)
-RUN apt-get update && apt-get install -y maven && rm -rf /var/lib/apt/lists/*
-
-# Set env vars for compiler args (for Lombok to work if recompilation needed)
-ENV MAVEN_OPTS="--add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED --add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED --add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED"
-
-# Default: run smoke test suite (can override with docker run CMD)
+# Run TestNG suite by default (change profile as needed)
 CMD ["mvn", "test", "-P", "smoke-test"]
