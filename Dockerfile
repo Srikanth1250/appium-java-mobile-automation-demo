@@ -1,5 +1,5 @@
-# Use an official Maven base image with Java 11
-FROM maven:3.9.6-eclipse-temurin-11 as build
+# ---- Build Stage ----
+FROM maven:3.9.6-eclipse-temurin-11 AS build
 
 # Set working directory inside container
 WORKDIR /app
@@ -7,17 +7,17 @@ WORKDIR /app
 # Copy all files into the container
 COPY . .
 
-# Build the project without running tests
+# Download dependencies and build the project, skip tests
 RUN mvn clean install -DskipTests
 
-# ---- Final Stage ----
-FROM eclipse-temurin:11-jre
+# ---- Final Stage (Runtime) ----
+FROM maven:3.9.6-eclipse-temurin-11 AS runtime
 
-# Set working directory in final image
+# Set working directory
 WORKDIR /app
 
-# Copy the built project from the build stage
-COPY --from=build /app .
+# Copy the whole Maven project (for running test profiles)
+COPY --from=build /app /app
 
-# Default command to run TestNG tests (you can change profile: smoke-test, regression-test, etc.)
+# Run specific TestNG suite using profile (default: smoke-test)
 CMD ["mvn", "test", "-P", "smoke-test"]
